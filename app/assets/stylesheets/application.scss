@@ -95,13 +95,6 @@ a {
     background-size: cover;*/
 }
 
-.hintergrund {
-      background-image: url(asset_path('hintergrund.jpg'));
-    background-attachment: fixed;
-    background-size: cover;
-  flex: 1 1 auto;
-}
-
 .error-section {
   background-color: $error-background-color;
 }
