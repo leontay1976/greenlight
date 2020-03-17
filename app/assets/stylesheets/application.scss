@@ -99,8 +99,12 @@ a {
   background-image: url(asset_path('hintergrund.jpg'));
   background-attachment: fixed;
   background-size: cover;
-  padding-top: 15rem !important;
-  padding-bottom: 15rem !important;
+  padding-top: 20rem !important;
+  padding-bottom: 20rem !important;
+}
+
+.weiss {
+  color: white;
 }
 
 .error-section {
