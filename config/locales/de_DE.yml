@@ -291,11 +291,11 @@ de_DE:
         signup_info: "Um sich mit Ihrer Email anzumelden, klicken Sie den untenstehenden Button und folgen Sie den Schritten."
         signup_link: Registrieren
         signup:
-          info: Ein eingeladener Nutzer hat sich bei Greenlight registriert.
+          info: Ein eingeladener Nutzer hat sich beim Konferenzsystem registriert.
           admins_link: Organisationsseite besuchen
-          subject: Registrierung neuer Greenlight-Nutzer
+          subject: Registrierung eines neuen Konferenzsystem-Nutzers
           username: "Der Nutzer hat sich mit dem Namen %{name} und der Email %{email} registriert."
-        subject: Einladung zur BigBlueButton-Teilnahme
+        subject: Einladung zur Konferenzsystem-Teilnahme
         username: "Ihr Nutzername ist %{email}."
       password_reset:
         title: 'Passwort zurücksetzen'
