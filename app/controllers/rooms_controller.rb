@@ -47,6 +47,20 @@ class RoomsController < ApplicationController
     @room.owner = current_user
     @room.room_settings = create_room_settings_string(room_params)
 
+    upload_file = room_params[:upload_file]
+    upload_filename = room_params[:upload_filename].gsub(' ', '_')
+
+    if upload_file
+      room_name = ((@room.name).clone).gsub(" ", "_")
+
+      logger.error ("room_name: " + room_name)
+      logger.error ("upload_filename: " + upload_filename)
+
+      File.open(Rails.root.join('public', 'presentation', room_name + '~_' + upload_filename), 'wb') do |file|
+         file.write(upload_file.read)
+      end
+    end
+
     # Save the room and redirect if it fails
     return redirect_to current_user.main_room, flash: { alert: I18n.t("room.create_room_error") } unless @room.save
 
@@ -156,11 +170,12 @@ class RoomsController < ApplicationController
     # Join the user in and start the meeting.
     opts = default_meeting_options
     opts[:user_is_moderator] = true
-
     # Include the user's choices for the room settings
     room_settings = JSON.parse(@room[:room_settings])
+    opts[:allow_recording] = room_settings["allowRecording"]
     opts[:mute_on_start] = room_settings["muteOnStart"]
     opts[:require_moderator_approval] = room_settings["requireModeratorApproval"]
+    opts[:upload_file] = room_settings["uploadFile"]
 
     begin
       redirect_to join_path(@room, current_user.name, opts, current_user.uid)
@@ -175,7 +190,7 @@ class RoomsController < ApplicationController
     NotifyUserWaitingJob.set(wait: 5.seconds).perform_later(@room)
   end
 
-  # POST /:room_uid/update_settings
+ # POST /:room_uid/update_settings
   def update_settings
     begin
       options = params[:room].nil? ? params : params[:room]
@@ -183,6 +198,22 @@ class RoomsController < ApplicationController
 
       # Update the rooms values
       room_settings_string = create_room_settings_string(options)
+
+      upload_file = params[:room][:upload_file]
+      upload_filename = params[:room][:upload_filename].gsub(' ', '_')
+      delete_file = params[:room][:delete_file]
+      room_name = (params[:room][:name].clone).gsub(' ', '_')
+
+      if !delete_file.blank?
+        filepath = Rails.root.join('public', 'presentation', room_name + '~_*')
+        Dir.glob(filepath).each { |file| File.delete(file)}
+      elsif upload_filename && upload_file
+        filepath = Rails.root.join('public', 'presentation', room_name + '~_*')
+        Dir.glob(filepath).each { |file| File.delete(file)}
+        File.open(Rails.root.join('public', 'presentation', room_name + '~_' + upload_filename), 'wb') do |file|
+           file.write(upload_file.read)
+         end
+      end
 
       @room.update_attributes(
         name: options[:name],
@@ -276,11 +307,16 @@ class RoomsController < ApplicationController
   private
 
   def create_room_settings_string(options)
+    if (!options[:upload_filename].blank?)
+      options[:upload_filename] = options[:upload_filename].gsub(' ', '_')
+    end
     room_settings = {
       "muteOnStart": options[:mute_on_join] == "1",
       "requireModeratorApproval": options[:require_moderator_approval] == "1",
       "anyoneCanStart": options[:anyone_can_start] == "1",
       "joinModerator": options[:all_join_moderator] == "1",
+      "allowRecording": options[:allow_recording] == "1",
+      "uploadFile": options[:upload_filename],
     }
 
     room_settings.to_json
