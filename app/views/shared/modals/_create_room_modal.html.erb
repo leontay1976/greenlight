@@ -43,6 +43,21 @@
               </span>
             </div>
 
+            <div class="input-icon mb-2">
+              <span id="file_clicker" class="input-icon-addon allow-icon-click cursor-pointer" onclick="upload_it()">
+                <i class="fas fa-file-alt"></i>
+              </span>
+              <%= f.label :upload_file, t("modal.create_room.upload_file_placeholder"), id: "create-room-upload-file", class: "form-control", :onclick => "upload_it()"
+              <span style="display: none;">
+                <%= f.file_field :upload_file, :onchange=>"uploadFile()", id: "upload_file" %>
+                <%= f.hidden_field :upload_filename, :value => "", id: "upload_filename" %>
+                <%= f.hidden_field :delete_file, :value => "", id: "delete_file" %>
+              </span>
+              <span onclick="clear_it()" class="input-icon-addon allow-icon-click cursor-pointer">
+                <i class="far fa-trash-alt"></i>
+              </span>
+            </div>
+            
             <% if Rails.configuration.room_features.include? "mute-on-join" %>
               <label class="custom-switch pl-0 mt-3 mb-3 w-100 text-left d-inline-block">
                 <span class="custom-switch-description"><%= t("modal.room_settings.mute")%></span>
