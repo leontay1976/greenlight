@@ -57,6 +57,8 @@ module Joiner
 
       opts[:require_moderator_approval] = room_settings["requireModeratorApproval"]
 
+      opts[:upload_file] = room_settings["uploadFile"]
+      
       if current_user
         redirect_to join_path(@room, current_user.name, opts, current_user.uid)
       else
