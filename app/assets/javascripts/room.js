@@ -144,6 +144,7 @@ function showCreateRoom(target) {
   $("#room_require_moderator_approval").prop("checked", false)
   $("#room_anyone_can_start").prop("checked", false)
   $("#room_all_join_moderator").prop("checked", false)
+  $("#room_allow_recording").prop("checked", false)
 
   //show all elements & their children with a create-only class
   $(".create-only").each(function() {
@@ -156,6 +157,10 @@ function showCreateRoom(target) {
     $(this).attr('style',"display:none !important")
     if($(this).children().length > 0) { $(this).children().attr('style',"display:none !important") }
   })
+
+  $("#create-room-upload-file").text(getLocalizedString("modal.create_room.upload_file_placeholder"))
+  $("#room_upload_filename").val(null)
+  $("#delete_file").val("")
 }
 
 function showUpdateRoom(target) {
@@ -199,12 +204,64 @@ function showDeleteRoom(target) {
 function updateCurrentSettings(settings_path){
   // Get current room settings and set checkbox
   $.get(settings_path, function(room_settings) {
-    var settings = JSON.parse(room_settings) 
+    var settings = JSON.parse(room_settings)
     $("#room_mute_on_join").prop("checked", settings.muteOnStart)
     $("#room_require_moderator_approval").prop("checked", settings.requireModeratorApproval)
     $("#room_anyone_can_start").prop("checked", settings.anyoneCanStart)
     $("#room_all_join_moderator").prop("checked", settings.joinModerator)
+    $("#room_allow_recording").prop("checked", settings.allowRecording)
+
+    if(settings.uploadFile) {
+
+      var uploadFile = settings.uploadFile
+
+      if(uploadFile){
+        $("#create-room-upload-file").text(uploadFile)
+        $("#room_upload_filename").val(uploadFile)
+      } else {
+        $("#create-room-upload-file").text(getLocalizedString("modal.create_room.upload_file_placeholder"))
+        $("#room_upload_filename").val(null)
+      }
+    } else {
+        $("#create-room-upload-file").text(getLocalizedString("modal.create_room.upload_file_placeholder"))
+        $("#room_upload_filename").val(null)
+    }
+    $("#delete_file").val("")
   })
+}
+
+function uploadFile() {
+        var filebox = document.getElementById('upload_file');
+        var label = document.getElementById('create-room-upload-file');
+        var filename_value = filebox.value.replace(/^.*[\\\/]/, '');
+        var filename = document.getElementById('upload_filename');
+        var delete_file = document.getElementById('delete_file');
+
+        if (filename) {
+                label.innerHTML = filename_value;
+                filename.value = filename_value;
+                delete_file.value = "";
+        } else {
+                label.innerHTML = getLocalizedString("modal.create_room.upload_file_placeholder");
+                filename.value = "";
+                delete_file.value = "1";
+        }
+}
+
+function upload_it() {
+        $("#upload_file").click();
+}
+
+function clear_it() {
+        var filebox = document.getElementById('upload_file');
+        filebox.value = "";
+        var filename = document.getElementById('upload_filename');
+        filename.value = "";
+        var delete_file = document.getElementById('delete_file');
+        delete_file.value = "1";
+
+        var label = document.getElementById('create-room-upload-file');
+        label.innerHTML = getLocalizedString("modal.create_room.upload_file_placeholder");
 }
 
 function generateAccessCode(){
